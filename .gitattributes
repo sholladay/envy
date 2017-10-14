@@ -1,0 +1,50 @@
+# Configuration for moving files between your working directory and the git database.
+
+* text=auto
+
+# Commit these with Unix line endings...
+
+# Source code.
+*.svg    text
+*.json   text
+*.js     text  eol=lf
+*.css    text  eol=lf  diff=css
+*.html   text  eol=lf  diff=html
+*.xml    text          diff=html
+*.sh     text  eol=lf
+*.bat    text
+
+# Templates and lists.
+*.csv         text
+
+# Documentation.
+*.md          text
+*.txt         text
+*.doc         diff
+*.docx        diff
+*.rtf         diff
+*.pdf         diff
+LICENSE       text
+LICENSES      text
+AUTHORS       text
+CONTRIBUTORS  text
+
+# Configuration files.
+.gitignore      text
+.gitattributes  text
+.editorconfig   text
+
+# Leave line endings alone for these...
+
+# Multimedia and compressed storage.
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.mov    binary
+*.mp4    binary
+*.mp3    binary
+*.gz     binary
+*.zip    binary
+*.woff2  binary
