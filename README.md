@@ -1,8 +1,8 @@
 # envy [![Build status for Envy](https://img.shields.io/circleci/project/sholladay/envy/master.svg "Build Status")](https://circleci.com/gh/sholladay/envy "Builds")
 
-> Load environment variables from a file
+> Load .env files and environment variables
 
-Similar to packages like [dotenv](https://npmjs.com/package/dotenv), but with improved safety and security. And strong tests to prove it.
+Secure and friendly alternative to [dotenv](https://npmjs.com/package/dotenv), using functional programming. With strong tests to prove its safety.
 
 *Looking for the old `envy` that reads JSON? See [eliOcs/node-envy](https://github.com/eliOcs/node-envy).*
 

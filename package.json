@@ -1,7 +1,7 @@
 {
     "name": "envy",
     "version": "1.0.0",
-    "description": "Load environment variables from a file",
+    "description": "Load .env files and environment variables",
     "homepage": "https://github.com/sholladay/envy",
     "main": "index.js",
     "author": {
