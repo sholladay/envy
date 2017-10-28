@@ -48,3 +48,4 @@ CONTRIBUTORS  text
 *.gz     binary
 *.zip    binary
 *.woff2  binary
+*.ai     binary

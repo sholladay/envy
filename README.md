@@ -1,6 +1,8 @@
-# envy [![Build status for Envy](https://img.shields.io/circleci/project/sholladay/envy/master.svg "Build Status")](https://circleci.com/gh/sholladay/envy "Builds")
+# [![envy](media/header.png)](https://github.com/sholladay/envy)
 
 > Load .env files and environment variables
+
+[![Build status for Envy](https://img.shields.io/circleci/project/sholladay/envy/master.svg "Build Status")](https://circleci.com/gh/sholladay/envy "Builds")
 
 Secure and friendly alternative to [dotenv](https://npmjs.com/package/dotenv), using functional programming. With strong tests to prove its safety.
 
@@ -140,7 +142,7 @@ port: 3000
 
 We recommend not using `process.env` directly. But let's say you want to because a dependency expects you to set `NODE_ENV` and you want to define it in `.env`. No problem!
 
-**You should first ask the project to accept options as input so you don't need this.**
+*You should first ask the project to accept options as input so you don't need this.*
 
 ```js
 const envy = require('envy');
