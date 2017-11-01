@@ -71,7 +71,7 @@ A `.env` file is used to provide the actual environment values. You should add t
 FOO=bar
 ```
 
-Environment files look just like normal shell files (e.g. `.bashrc` and friends). Values with spaces may be optionally wrapped in `'` single quotes. This is recommended for shell compatibility.
+Environment files look just like normal shell files (e.g. `.bashrc` and friends). Values may be optionally wrapped in `'` single quotes. This is recommended for shell compatibility, in case the value contains whitespace.
 
 ```sh
 # This is a comment.
@@ -108,15 +108,12 @@ const joi = require('joi');
 
 const cli = meow();
 
-const config = Object.assign({}, envy(), cli.flags);
-const { error, value } = joi.validate(config, {
+const input = Object.assign({}, envy(), cli.flags);
+const config = joi.attempt(input, {
     port : joi.number().positive().integer().min(0).max(65535)
 });
-if (error) {
-    throw error;
-}
 // value.port has been parsed as a number
-console.log('port:', value.port);
+console.log('port:', config.port);
 ```
 ```sh
 # .env.example
