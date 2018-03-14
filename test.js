@@ -64,6 +64,19 @@ test('requires secure file permissions on .env', (t) => {
     t.is(err.message, `File permissions are unsafe. Fix: chmod 600 '${filepath}'`);
 });
 
+test('requires secure file permissions on .env in windows land', (t) => {
+    const previousPlatform = process.platform;
+    process.platform = 'win32';
+
+    const err = t.throws(() => {
+        fixture('unsafe-perm-windows-env-777');
+    }, Error);
+    const filepath = path.join('fixture', 'unsafe-perm-env-640', '.env');
+    t.is(err.message, `File permissions are unsafe. Fix: chmod 600 '${filepath}'`);
+
+    process.platform = previousPlatform;
+});
+
 test('requires secure file permissions on .env.example', (t) => {
     const err = t.throws(() => {
         fixture('unsafe-perm-example-602');

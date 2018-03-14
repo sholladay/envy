@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const isWsl = require('is-wsl');
 const filterObj = require('filter-obj');
 const camelcase = require('camelcase');
 const camelcaseKeys = require('camelcase-keys');
@@ -9,6 +10,7 @@ const loadEnvFile = require('./lib/load-env-file');
 
 const num = fs.constants;
 const permissionMask = 0o777;
+const windowsPermission = 0o555;
 const ownerReadWrite = num.S_IRUSR | num.S_IWUSR;
 
 const checkMode = (filepath, mask) => {
@@ -24,6 +26,10 @@ const assertHidden = (filepath) => {
     if (!filename.startsWith('.')) {
         throw new Error(`Filepath must be hidden, use ".${filename}" instead of "${filename}"`);
     }
+};
+
+const isWindows = () => {
+    return isWsl || process.platform === 'win32';
 };
 
 const envy = (input) => {
@@ -61,7 +67,10 @@ const envy = (input) => {
         return filterObj(camelizedGlobalEnv, camelizedExampleEnvKeys);
     }
 
-    if (checkMode(envPath, permissionMask) !== ownerReadWrite) {
+    if (isWindows() && checkMode(envPath, permissionMask) !== windowsPermission) {
+        throw new Error(`File permissions are unsafe. Make them 666 '${envPath}'`);
+    }
+    else if (!isWindows() && checkMode(envPath, permissionMask) !== ownerReadWrite) {
         throw new Error(`File permissions are unsafe. Fix: chmod 600 '${envPath}'`);
     }
 

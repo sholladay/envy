@@ -8,3 +8,4 @@ set -eu;
 chmod 600 fixture/*/.env;
 chmod 640 'fixture/unsafe-perm-env-640/.env';
 chmod 602 'fixture/unsafe-perm-example-602/.env.example';
+chmod 777 'fixture/unsafe-perm-windows-env-777/.env';
