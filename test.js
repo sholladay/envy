@@ -7,6 +7,17 @@ const fixture = (dir, file = '.env') => {
     return envy(path.join('fixture', dir, file));
 };
 
+const monkey = (obj, prop) => {
+    const original = Object.getOwnPropertyDescriptor(obj, prop);
+
+    return () => {
+        delete obj[prop];
+        if (original) {
+            Object.defineProperty(obj, prop, original);
+        }
+    };
+};
+
 test('returns camelcased keys', (t) => {
     const env = fixture('normal');
     const keys = Object.keys(env);
@@ -65,16 +76,18 @@ test('requires secure file permissions on .env', (t) => {
 });
 
 test('requires secure file permissions on .env in windows land', (t) => {
-    const previousPlatform = process.platform;
-    process.platform = 'win32';
-
+    const restore = monkey(process, 'platform');
+    Object.defineProperty(process, 'platform', {
+        configurable : true,
+        value        : 'win32'
+    });
     const err = t.throws(() => {
         fixture('unsafe-perm-windows-env-777');
     }, Error);
     const filepath = path.join('fixture', 'unsafe-perm-windows-env-777', '.env');
     t.is(err.message, `File permissions are unsafe. Make them 555 '${filepath}'`);
 
-    process.platform = previousPlatform;
+    restore();
 });
 
 test('requires secure file permissions on .env.example', (t) => {
