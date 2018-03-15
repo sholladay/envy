@@ -68,7 +68,7 @@ const envy = (input) => {
     }
 
     if (isWindows() && checkMode(envPath, permissionMask) !== windowsPermission) {
-        throw new Error(`File permissions are unsafe. Make them 666 '${envPath}'`);
+        throw new Error(`File permissions are unsafe. Make them 555 '${envPath}'`);
     }
     else if (!isWindows() && checkMode(envPath, permissionMask) !== ownerReadWrite) {
         throw new Error(`File permissions are unsafe. Fix: chmod 600 '${envPath}'`);
