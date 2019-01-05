@@ -54,6 +54,7 @@ const isWindows = () => {
     return isWsl || process.platform === 'win32';
 };
 
+// eslint-disable-next-line max-statements
 const envy = (input) => {
     const envPath = input || '.env';
     const examplePath = envPath + '.example';
