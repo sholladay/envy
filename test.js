@@ -64,7 +64,7 @@ test('requires env files to be hidden', (t) => {
     const err = t.throws(() => {
         fixture('normal', bad);
     }, Error);
-    t.is(err.message, `Filepath must be hidden, use "${good}" instead of "${bad}"`);
+    t.is(err.message, `Filepath must be hidden. Fix: mv '${bad}' '${good}'`);
 });
 
 test('requires secure file permissions on .env', (t) => {
@@ -151,5 +151,5 @@ test('requires all vars from .env.example', (t) => {
     const err = t.throws(() => {
         fixture('missing-env-entry');
     }, Error);
-    t.is(err.message, `Environment variables are missing: MISSING, EMPTY`);
+    t.is(err.message, 'Environment variables are missing: MISSING, EMPTY');
 });

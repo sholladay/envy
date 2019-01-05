@@ -29,15 +29,16 @@
         "index.js"
     ],
     "dependencies": {
-        "camelcase": "^4.1.0",
-        "camelcase-keys": "^4.1.0",
+        "camelcase": "^5.0.0",
+        "camelcase-keys": "^5.0.0",
         "filter-obj": "^1.1.0",
-        "is-wsl": "^1.1.0"
+        "is-wsl": "^1.1.0",
+        "path-type": "^3.0.0"
     },
     "devDependencies": {
-        "ava": "^0.22.0",
-        "eslint-config-tidy": "^0.5.0",
-        "xo": "^0.18.0"
+        "ava": "^1.0.1",
+        "eslint-config-tidy": "^0.7.0",
+        "xo": "^0.23.0"
     },
     "keywords": [
         "env",

@@ -19,6 +19,7 @@ Follows the [Twelve Factor App](https://12factor.net) methodology.
  - [Tips](#tips)
  - [FAQ](#faq)
  - [Resources](#resources)
+ - [Related](#related)
  - [Contributing](#contributing)
  - [License](#license)
 
@@ -29,10 +30,11 @@ Follows the [Twelve Factor App](https://12factor.net) methodology.
  - Validates required env vars are defined.
  - No side effects, does not modify [`process.env`](https://nodejs.org/api/process.html#process_process_env).
  - Returns property names in [camelCase](https://github.com/sindresorhus/camelcase).
+ - Asserts that `.env` is ignored in git.
 
 Have you spent a day rotating passwords because a developer accidentally pushed them to the repository? Yeah, that actually happens and it can cause chaos at companies. It doesn't matter if you delete the commit. Once it's out there, game over. People who are authorized to read the repository may not be authorized to have those credentials, including third party tools and services. If the repository is public, search engines may have crawled it. Consider everything to be compromised.
 
-The `envy` module helps you prevent that situation by providing a convenient mechanism for everyone to store credentials and other config locally and validate that it is correct without commiting them to the repository. It verifies that all relevant files have secure permissions and (coming soon) that the secrets file is explicitly ignored so that it cannot accidentally be commited.
+The `envy` module helps you prevent that situation by providing a convenient mechanism for everyone to store credentials and other config locally and validate that it is correct without commiting them to the repository. It verifies that all relevant files have secure permissions and that the secrets file is explicitly ignored so that it cannot accidentally be commited.
 
 ## Install
 
@@ -164,6 +166,10 @@ I see this as a successor to those projects. But `envy` would not exist without 
  - [Manage secrets safely](https://digitalocean.com/community/tutorials/an-introduction-to-managing-secrets-safely-with-version-control-systems)
  - [Remove secrets from a repository](https://help.github.com/articles/removing-sensitive-data-from-a-repository/)
  - [Store config in the environment](https://12factor.net/config)
+
+# Related
+
+ - [meow](https://github.com/sindresorhus/meow) - Make command line apps
 
 ## Contributing
 
