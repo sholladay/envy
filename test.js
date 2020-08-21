@@ -39,6 +39,10 @@ test('returns excess vars in .env', (t) => {
     });
 });
 
+test('returns empty collection of vars', (t) => {
+    t.deepEqual(fixture('empty-example'), {});
+});
+
 test('can parse complex values', (t) => {
     // Complex values are those which have a high risk of confusing the parser,
     // such as those using reserved characters.
@@ -96,14 +100,6 @@ test('requires secure file permissions on .env.example', (t) => {
     }, Error);
     const filepath = path.join('fixture', 'unsafe-perm-example-602', '.env.example');
     t.is(err.message, `File must not be writable by others. Fix: chmod o-w '${filepath}'`);
-});
-
-test('requires at least one entry in .env.example', (t) => {
-    const err = t.throws(() => {
-        fixture('empty-example');
-    }, Error);
-    const filepath = path.join('fixture', 'empty-example', '.env.example');
-    t.is(err.message, `At least one entry is required in ${filepath}`);
 });
 
 test('does not modify process.env', (t) => {
