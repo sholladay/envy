@@ -3,8 +3,12 @@ import test from 'ava';
 import camelcase from 'camelcase';
 import envy from '.';
 
-const fixture = (dir, file = '.env') => {
-    return envy(path.join('fixture', dir, file));
+const fixturePath = (dir, file = '.env') => {
+    return path.join('fixture', dir, file);
+};
+
+const fixture = (dir, file) => {
+    return envy(fixturePath(dir, file));
 };
 
 const monkey = (obj, prop) => {
@@ -108,7 +112,7 @@ test('requires at least one entry in .env.example', (t) => {
 
 test('does not modify process.env', (t) => {
     const oldEnvDescriptor = Object.getOwnPropertyDescriptor(process, 'env');
-    const oldEnv = process.env;
+    const oldEnv = process.env; // eslint-disable-line no-process-env
     const envCopy = Object.create(
         Object.getPrototypeOf(oldEnv),
         Object.getOwnPropertyDescriptors(oldEnv)
@@ -117,8 +121,8 @@ test('does not modify process.env', (t) => {
         myKey : 'my val',
         dog   : 'woof'
     });
-    t.is(process.env, oldEnv);
-    t.deepEqual(process.env, envCopy);
+    t.is(process.env, oldEnv); // eslint-disable-line no-process-env
+    t.deepEqual(process.env, envCopy); // eslint-disable-line no-process-env
     t.deepEqual(Object.getOwnPropertyDescriptor(process, 'env'), oldEnvDescriptor);
 });
 
@@ -152,4 +156,73 @@ test('requires all vars from .env.example', (t) => {
         fixture('missing-env-entry');
     }, Error);
     t.is(err.message, 'Environment variables are missing: MISSING, EMPTY');
+});
+
+test('supports filepath as option', (t) => {
+    const result = envy({
+        filepath : fixturePath('normal')
+    });
+    t.deepEqual(result, {
+        myKey : 'my val',
+        dog   : 'woof'
+    });
+});
+
+test('supports explicit env as option', (t) => {
+    const result = envy({
+        filepath : fixturePath('normal'),
+        env      : {
+            MY_KEY : 'my alternate val'
+        }
+    });
+    t.deepEqual(result, {
+        myKey : 'my alternate val',
+        dog   : 'woof'
+    });
+});
+
+test('ignores unknown global env vars by default', (t) => {
+    const result = envy({
+        filepath : fixturePath('normal'),
+        env      : {
+            UNKNOWN_VAR : 'this should not appear in result'
+        }
+    });
+    t.deepEqual(result, {
+        myKey : 'my val',
+        dog   : 'woof'
+    });
+});
+
+test('accepts all unknown global env vars when allowUnknown option is true', (t) => {
+    const result = envy({
+        filepath     : fixturePath('normal'),
+        allowUnknown : true,
+        env          : {
+            DOG         : 'overridden woof',
+            UNKNOWN_VAR : 'this should appear in result'
+        }
+    });
+    t.deepEqual(result, {
+        myKey      : 'my val',
+        dog        : 'overridden woof',
+        unknownVar : 'this should appear in result'
+    });
+});
+
+test('accepts specific unknown global env vars when allowUnknown option is an array', (t) => {
+    const result = envy({
+        filepath     : fixturePath('normal'),
+        allowUnknown : ['UNKNOWN_VAR'],
+        env          : {
+            DOG              : 'overridden woof',
+            UNKNOWN_VAR      : 'this should appear in result',
+            VERY_UNKNOWN_VAR : 'this should not appear in result'
+        }
+    });
+    t.deepEqual(result, {
+        myKey      : 'my val',
+        dog        : 'overridden woof',
+        unknownVar : 'this should appear in result'
+    });
 });
