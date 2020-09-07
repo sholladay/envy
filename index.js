@@ -30,7 +30,8 @@ const assertHidden = (filepath) => {
 };
 
 const assertIgnored = (filepath) => {
-    const failMessage = `File must be ignored by git. Fix: echo '${path.basename(filepath)}' >> .gitignore`;
+    const basename = path.basename(filepath);
+    const failMessage = `File must be ignored by git. Fix: echo '${basename}' >> .gitignore`;
     let ignores;
     try {
         ignores = fs.readFileSync(path.join(filepath, '..', '.gitignore'), 'utf8');
@@ -54,10 +55,44 @@ const isWindows = () => {
     return isWsl || process.platform === 'win32';
 };
 
-// eslint-disable-next-line max-statements
-const envy = (input) => {
-    const envPath = input || '.env';
+const assertSafePermissions = (filepath) => {
+    if (isWindows() && checkMode(filepath, permissionMask) !== windowsPermission) {
+        throw new Error(`File permissions are unsafe. Make them 555 '${filepath}'`);
+    }
+    else if (!isWindows() && checkMode(filepath, permissionMask) !== ownerReadWrite) {
+        throw new Error(`File permissions are unsafe. Fix: chmod 600 '${filepath}'`);
+    }
+};
+
+const applyAllowedKeys = (obj, allowUnknownKeys, keepKeys) => {
+    if (allowUnknownKeys === true) {
+        return obj;
+    }
+    return filterObj(obj, [...allowUnknownKeys, ...keepKeys]);
+};
+
+const hasStringValues = (obj) => {
+    return Object.values(obj).some((val) => {
+        return val !== '';
+    });
+};
+
+const normalizeOptions = (opts) => {
+    const options = opts && typeof opts === 'object' ? opts : { filepath : opts };
+    return {
+        env          : options.env || process.env, // eslint-disable-line no-process-env
+        filepath     : options.filepath || '.env',
+        allowUnknown : options.allowUnknown || []
+    };
+};
+
+const envy = (opts) => {
+    const options = normalizeOptions(opts);
+    const envPath = options.filepath;
     const examplePath = envPath + '.example';
+    const camelizedAllowUnknownEnvKeys = Array.isArray(options.allowUnknown) ?
+        options.allowUnknown.map(camelcase) :
+        options.allowUnknown;
 
     assertHidden(envPath);
 
@@ -72,14 +107,11 @@ const envy = (input) => {
     if (exampleEnvKeys.length === 0) {
         throw new Error(`At least one entry is required in ${examplePath}`);
     }
-    const exampleHasValues = Object.values(exampleEnv).some((val) => {
-        return val !== '';
-    });
-    if (exampleHasValues) {
+    if (hasStringValues(exampleEnv)) {
         throw new Error(`No values are allowed in ${examplePath}, put them in ${envPath} instead`);
     }
 
-    const camelizedGlobalEnv = camelcaseKeys(process.env);
+    const camelizedGlobalEnv = camelcaseKeys(options.env);
     const camelizedGlobalEnvKeys = Object.keys(camelizedGlobalEnv);
 
     // We treat env vars as case insensitive, like Windows does.
@@ -88,16 +120,14 @@ const envy = (input) => {
     });
 
     if (!needsEnvFile) {
-        return filterObj(camelizedGlobalEnv, camelizedExampleEnvKeys);
+        return applyAllowedKeys(
+            camelizedGlobalEnv,
+            camelizedAllowUnknownEnvKeys,
+            camelizedExampleEnvKeys
+        );
     }
 
-    if (isWindows() && checkMode(envPath, permissionMask) !== windowsPermission) {
-        throw new Error(`File permissions are unsafe. Make them 555 '${envPath}'`);
-    }
-    else if (!isWindows() && checkMode(envPath, permissionMask) !== ownerReadWrite) {
-        throw new Error(`File permissions are unsafe. Fix: chmod 600 '${envPath}'`);
-    }
-
+    assertSafePermissions(envPath);
     assertIgnored(envPath);
 
     const camelizedLocalEnv = camelcaseKeys(loadEnvFile(envPath));
@@ -112,16 +142,20 @@ const envy = (input) => {
         return !camelizedMergedEnv[key] || !camelizedMergedEnvKeys.includes(key);
     });
     if (camelizedMissingKeys.length > 0) {
-        const missingKeys = camelizedMissingKeys.map((camelizedMissingKey) => {
-            return exampleEnvKeys.find((exampleKey) => {
-                return camelcase(exampleKey) === camelizedMissingKey;
-            });
+        const missingKeys = exampleEnvKeys.filter((exampleKey) => {
+            return camelizedMissingKeys.includes(camelcase(exampleKey));
         });
         throw new Error(`Environment variables are missing: ${missingKeys.join(', ')}`);
     }
 
-    const keepKeys = [...new Set([...Object.keys(camelizedLocalEnv), ...camelizedExampleEnvKeys])];
-    return filterObj(camelizedMergedEnv, keepKeys);
+    return applyAllowedKeys(
+        camelizedMergedEnv,
+        camelizedAllowUnknownEnvKeys,
+        [
+            ...Object.keys(camelizedLocalEnv),
+            ...camelizedExampleEnvKeys
+        ]
+    );
 };
 
 module.exports = envy;
