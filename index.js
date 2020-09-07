@@ -54,7 +54,6 @@ const isWindows = () => {
     return isWsl || process.platform === 'win32';
 };
 
-// eslint-disable-next-line max-statements
 const envy = (input) => {
     const envPath = input || '.env';
     const examplePath = envPath + '.example';
@@ -69,9 +68,6 @@ const envy = (input) => {
     const exampleEnvKeys = Object.keys(exampleEnv);
     const camelizedExampleEnvKeys = Object.keys(camelcaseKeys(exampleEnv));
 
-    if (exampleEnvKeys.length === 0) {
-        throw new Error(`At least one entry is required in ${examplePath}`);
-    }
     const exampleHasValues = Object.values(exampleEnv).some((val) => {
         return val !== '';
     });
