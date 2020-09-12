@@ -4,11 +4,9 @@
 
 [![Build status for Envy](https://travis-ci.com/sholladay/envy.svg?branch=master "Build Status")](https://travis-ci.com/sholladay/envy "Builds")
 
-Secure and friendly alternative to [dotenv](https://npmjs.com/package/dotenv), using functional programming. With strong tests to prove its safety.
+Secure and friendly alternative to [dotenv](https://npmjs.com/package/dotenv), using functional programming, with strong tests to prove its safety.
 
 Follows the [Twelve Factor App](https://12factor.net) methodology.
-
-*Looking for the old `envy` that reads JSON? See [eliOcs/node-envy](https://github.com/eliOcs/node-envy).*
 
 ## Contents
 
@@ -32,6 +30,8 @@ Follows the [Twelve Factor App](https://12factor.net) methodology.
  - Returns property names in [camelCase](https://github.com/sindresorhus/camelcase).
  - Asserts that `.env` is ignored in git.
 
+You want to keep your secrets safe, right? `envy` loads your app's configuration values from a `.env` file and prevents mistakes, such as accidentally committing the `.env` file to your repository, or leaving `.env` with unsafe permissions.
+
 Have you spent a day rotating passwords because a developer accidentally pushed them to the repository? Yeah, that actually happens and it can cause chaos at companies. It doesn't matter if you delete the commit. Once it's out there, game over. People who are authorized to read the repository may not be authorized to have those credentials, including third party tools and services. If the repository is public, search engines may have crawled it. Consider everything to be compromised.
 
 The `envy` module helps you prevent that situation by providing a convenient mechanism for everyone to store credentials and other config locally and validate that it is correct without commiting them to the repository. It verifies that all relevant files have secure permissions and that the secrets file is explicitly ignored so that it cannot accidentally be commited.
@@ -44,16 +44,10 @@ npm install envy --save
 
 ## Usage
 
-Get it into your program.
-
 ```js
 const envy = require('envy');
-```
-
-Load the environment variables.
-
-```js
 const env = envy();
+console.log(env);
 // {
 //     foo : 'bar'
 // }
@@ -66,7 +60,7 @@ A `.env.example` file is used as a template to determine which environment varia
 FOO=
 ```
 
-A `.env` file is used to provide the actual environment values. You should add this file to a local [`.gitignore`](https://help.github.com/articles/ignoring-files).
+A `.env` file is used to provide the actual environment values. You must add this file to a local [`.gitignore`](https://help.github.com/articles/ignoring-files) to prevent leaking secrets and `envy` will check that you did this correctly.
 
 ```sh
 # .env
