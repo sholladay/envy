@@ -4,6 +4,7 @@
     "description": "Load .env files and environment variables",
     "homepage": "https://github.com/sholladay/envy",
     "main": "index.js",
+    "type": "module",
     "author": {
         "name": "Seth Holladay",
         "url": "https://seth-holladay.com",
@@ -21,7 +22,7 @@
         "email": "me@seth-holladay.com"
     },
     "engines": {
-        "node": ">=10"
+        "node": ">=20"
     },
     "license": "MPL-2.0",
     "files": [
@@ -29,16 +30,16 @@
         "index.js"
     ],
     "dependencies": {
-        "camelcase": "^5.0.0",
-        "camelcase-keys": "^5.0.0",
-        "filter-obj": "^1.1.0",
-        "is-wsl": "^1.1.0",
-        "path-type": "^3.0.0"
+        "camelcase": "^8.0.0",
+        "camelcase-keys": "^9.1.3",
+        "filter-obj": "^6.1.0",
+        "is-wsl": "^3.1.0",
+        "path-type": "^6.0.0"
     },
     "devDependencies": {
-        "ava": "^1.0.1",
-        "eslint-config-tidy": "^0.7.0",
-        "xo": "^0.23.0"
+        "ava": "^6.4.1",
+        "eslint-config-tidy": "^0.15.2",
+        "xo": "^1.2.1"
     },
     "keywords": [
         "env",
@@ -62,28 +63,5 @@
         "option",
         "file",
         "files"
-    ],
-    "xo": {
-        "extend": "tidy",
-        "overrides": [
-            {
-                "files": [
-                    "index.js",
-                    "lib/load-env-file.js"
-                ],
-                "rules": {
-                    "no-sync": "off",
-                    "no-bitwise": [
-                        "error",
-                        {
-                            "allow": [
-                                "&",
-                                "|"
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
-    }
+    ]
 }

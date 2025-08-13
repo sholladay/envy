@@ -2,7 +2,7 @@
 
 > Load .env files and environment variables
 
-[![Build status for Envy](https://travis-ci.com/sholladay/envy.svg?branch=master "Build Status")](https://travis-ci.com/sholladay/envy "Builds")
+[![Build status for Envy](https://api.travis-ci.com/sholladay/envy.svg "Build Status")](https://travis-ci.com/sholladay/envy "Builds")
 
 Secure and friendly alternative to [dotenv](https://npmjs.com/package/dotenv), using functional programming, with strong tests to prove its safety.
 

@@ -1,18 +1,16 @@
-'use strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
+import isWsl from 'is-wsl';
+import { isDirectorySync } from 'path-type';
+import { includeKeys } from 'filter-obj';
+import camelcase from 'camelcase';
+import camelcaseKeys from 'camelcase-keys';
+import loadEnvFile from './lib/load-env-file.js';
 
-const fs = require('fs');
-const path = require('path');
-const isWsl = require('is-wsl');
-const pathType = require('path-type');
-const filterObj = require('filter-obj');
-const camelcase = require('camelcase');
-const camelcaseKeys = require('camelcase-keys');
-const loadEnvFile = require('./lib/load-env-file');
-
-const num = fs.constants;
 const permissionMask = 0o777;
 const windowsPermission = 0o555;
-const ownerReadWrite = num.S_IRUSR | num.S_IWUSR;
+const ownerReadWrite = fs.constants.S_IRUSR | fs.constants.S_IWUSR;
 
 const checkMode = (filepath, mask) => {
     const status = fs.statSync(filepath);
@@ -37,7 +35,7 @@ const assertIgnored = (filepath) => {
     }
     catch (error) {
         if (error.code === 'ENOENT') {
-            if (!pathType.dirSync(path.join(filepath, '..', '.git'))) {
+            if (!isDirectorySync(path.join(filepath, '..', '.git'))) {
                 return;
             }
             throw new Error(failMessage);
@@ -60,7 +58,7 @@ const envy = (input) => {
 
     assertHidden(envPath);
 
-    if (checkMode(examplePath, num.S_IWOTH) === num.S_IWOTH) {
+    if (checkMode(examplePath, fs.constants.S_IWOTH) === fs.constants.S_IWOTH) {
         throw new Error(`File must not be writable by others. Fix: chmod o-w '${examplePath}'`);
     }
 
@@ -68,8 +66,8 @@ const envy = (input) => {
     const exampleEnvKeys = Object.keys(exampleEnv);
     const camelizedExampleEnvKeys = Object.keys(camelcaseKeys(exampleEnv));
 
-    const exampleHasValues = Object.values(exampleEnv).some((val) => {
-        return val !== '';
+    const exampleHasValues = Object.values(exampleEnv).some((value) => {
+        return value !== '';
     });
     if (exampleHasValues) {
         throw new Error(`No values are allowed in ${examplePath}, put them in ${envPath} instead`);
@@ -84,7 +82,7 @@ const envy = (input) => {
     });
 
     if (!needsEnvFile) {
-        return filterObj(camelizedGlobalEnv, camelizedExampleEnvKeys);
+        return includeKeys(camelizedGlobalEnv, camelizedExampleEnvKeys);
     }
 
     if (isWindows() && checkMode(envPath, permissionMask) !== windowsPermission) {
@@ -116,8 +114,8 @@ const envy = (input) => {
         throw new Error(`Environment variables are missing: ${missingKeys.join(', ')}`);
     }
 
-    const keepKeys = [...new Set([...Object.keys(camelizedLocalEnv), ...camelizedExampleEnvKeys])];
-    return filterObj(camelizedMergedEnv, keepKeys);
+    const keepKeys = new Set([...Object.keys(camelizedLocalEnv), ...camelizedExampleEnvKeys]);
+    return includeKeys(camelizedMergedEnv, keepKeys);
 };
 
-module.exports = envy;
+export default envy;

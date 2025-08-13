@@ -1,19 +1,20 @@
-import path from 'path';
+import path from 'node:path';
+import process from 'node:process';
 import test from 'ava';
 import camelcase from 'camelcase';
-import envy from '.';
+import envy from './index.js';
 
 const fixture = (dir, file = '.env') => {
     return envy(path.join('fixture', dir, file));
 };
 
-const monkey = (obj, prop) => {
-    const original = Object.getOwnPropertyDescriptor(obj, prop);
+const monkey = (object, prop) => {
+    const original = Object.getOwnPropertyDescriptor(object, prop);
 
     return () => {
-        delete obj[prop];
+        delete object[prop];
         if (original) {
-            Object.defineProperty(obj, prop, original);
+            Object.defineProperty(object, prop, original);
         }
     };
 };
@@ -22,9 +23,9 @@ test('returns camelcased keys', (t) => {
     const env = fixture('normal');
     const keys = Object.keys(env);
     t.is(keys.length, 2);
-    keys.forEach((key) => {
+    for (const key of keys) {
         t.is(key, camelcase(key));
-    });
+    }
     t.deepEqual(env, {
         myKey : 'my val',
         dog   : 'woof'
@@ -55,28 +56,28 @@ test('can parse complex values', (t) => {
 });
 
 test('requires keys for environment variables', (t) => {
-    const err = t.throws(() => {
+    const error = t.throws(() => {
         fixture('missing-key');
-    }, Error);
+    }, { instanceOf : Error });
     const filepath = path.join('fixture', 'missing-key', '.env');
-    t.is(err.message, `Missing key for environment variable in ${filepath}`);
+    t.is(error.message, `Missing key before "=" for variable in ${filepath}`);
 });
 
 test('requires env files to be hidden', (t) => {
     const bad = 'env';
     const good = '.' + bad;
-    const err = t.throws(() => {
+    const error = t.throws(() => {
         fixture('normal', bad);
-    }, Error);
-    t.is(err.message, `Filepath must be hidden. Fix: mv '${bad}' '${good}'`);
+    }, { instanceOf : Error });
+    t.is(error.message, `Filepath must be hidden. Fix: mv '${bad}' '${good}'`);
 });
 
 test('requires secure file permissions on .env', (t) => {
-    const err = t.throws(() => {
+    const error = t.throws(() => {
         fixture('unsafe-perm-env-640');
-    }, Error);
+    }, { instanceOf : Error });
     const filepath = path.join('fixture', 'unsafe-perm-env-640', '.env');
-    t.is(err.message, `File permissions are unsafe. Fix: chmod 600 '${filepath}'`);
+    t.is(error.message, `File permissions are unsafe. Fix: chmod 600 '${filepath}'`);
 });
 
 test('requires secure file permissions on .env in windows land', (t) => {
@@ -85,21 +86,21 @@ test('requires secure file permissions on .env in windows land', (t) => {
         configurable : true,
         value        : 'win32'
     });
-    const err = t.throws(() => {
+    const error = t.throws(() => {
         fixture('unsafe-perm-windows-env-777');
-    }, Error);
+    }, { instanceOf : Error });
     const filepath = path.join('fixture', 'unsafe-perm-windows-env-777', '.env');
-    t.is(err.message, `File permissions are unsafe. Make them 555 '${filepath}'`);
+    t.is(error.message, `File permissions are unsafe. Make them 555 '${filepath}'`);
 
     restore();
 });
 
 test('requires secure file permissions on .env.example', (t) => {
-    const err = t.throws(() => {
+    const error = t.throws(() => {
         fixture('unsafe-perm-example-602');
-    }, Error);
+    }, { instanceOf : Error });
     const filepath = path.join('fixture', 'unsafe-perm-example-602', '.env.example');
-    t.is(err.message, `File must not be writable by others. Fix: chmod o-w '${filepath}'`);
+    t.is(error.message, `File must not be writable by others. Fix: chmod o-w '${filepath}'`);
 });
 
 test('does not modify process.env', (t) => {
@@ -119,33 +120,33 @@ test('does not modify process.env', (t) => {
 });
 
 test('disallows values in .env.example', (t) => {
-    const err = t.throws(() => {
+    const error = t.throws(() => {
         fixture('example-has-values');
-    }, Error);
+    }, { instanceOf : Error });
     const envPath = path.join('fixture', 'example-has-values', '.env');
     const examplePath = envPath + '.example';
-    t.is(err.message, `No values are allowed in ${examplePath}, put them in ${envPath} instead`);
+    t.is(error.message, `No values are allowed in ${examplePath}, put them in ${envPath} instead`);
 });
 
 test('friendly error if .env.example is not a file', (t) => {
-    const err = t.throws(() => {
+    const error = t.throws(() => {
         fixture('example-not-file');
-    }, Error);
+    }, { instanceOf : Error });
     const filepath = path.join('fixture', 'example-not-file', '.env.example');
-    t.is(err.message, `Filepath must be a file: ${filepath}`);
+    t.is(error.message, `Filepath must be a file: ${filepath}`);
 });
 
 test('friendly error if .env is not a file', (t) => {
-    const err = t.throws(() => {
+    const error = t.throws(() => {
         fixture('env-not-file');
-    }, Error);
+    }, { instanceOf : Error });
     const filepath = path.join('fixture', 'env-not-file', '.env');
-    t.is(err.message, `Filepath must be a file: ${filepath}`);
+    t.is(error.message, `Filepath must be a file: ${filepath}`);
 });
 
 test('requires all vars from .env.example', (t) => {
-    const err = t.throws(() => {
+    const error = t.throws(() => {
         fixture('missing-env-entry');
-    }, Error);
-    t.is(err.message, 'Environment variables are missing: MISSING, EMPTY');
+    }, { instanceOf : Error });
+    t.is(error.message, 'Environment variables are missing: MISSING, EMPTY');
 });
